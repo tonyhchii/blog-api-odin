@@ -19,7 +19,7 @@ const validateForm = [
 ];
 
 const signUp = [
-  (req, res) => {
+  async (req, res) => {
     const errors = [];
     if (errors) {
       bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {

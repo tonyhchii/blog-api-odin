@@ -10,4 +10,10 @@ async function createUser(username, password, email) {
   });
 }
 
-module.exports = { createUser };
+async function findUserById(userId) {
+  return await pool.user.findFirst({
+    where: { id: userId },
+  });
+}
+
+module.exports = { createUser, findUserById };
