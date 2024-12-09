@@ -56,7 +56,6 @@ const getPostByID = async (req, res) => {
           username: true,
         },
       },
-      comments: true,
     },
   });
 
@@ -88,4 +87,4 @@ const createPost = async (req, res) => {
   res.status(200).json(post);
 };
 
-module.exports = { getAllPosts, createPost };
+module.exports = { getAllPosts, createPost, getPostByID };
