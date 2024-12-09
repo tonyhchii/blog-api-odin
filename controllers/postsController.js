@@ -1,8 +1,49 @@
 const prisma = require("../db/pool");
 const CustomError = require("../utils/customError");
 
-const getAllPosts = (req, res) => {
-  console.log(req.user);
+const getAllPosts = async (req, res) => {
+  const { sort = "createdAt", order = "desc", search = "" } = req.query;
+
+  const { user } = req;
+
+  const validSortFields = ["createdAt", "title", "comments"];
+  const validOrderValues = ["asc", "desc"];
+
+  if (!validSortFields.includes(sort)) {
+    throw new CustomError(`Invalid sort field: ${sort}`, 400);
+  }
+
+  if (!validOrderValues.includes(order)) {
+    throw new CustomError(`Invalid order value: ${order}`, 400);
+  }
+
+  const where = {
+    title: {
+      contains: search,
+      mode: "insensitive",
+    },
+    ...(user ? { authorId: user.id } : { isPublished: true }),
+  };
+
+  let orderBy;
+  if (sort === "comments") {
+    orderBy = { [sort]: { _count: order } };
+  } else {
+    orderBy = { [sort]: order };
+  }
+
+  const posts = await prisma.post.findMany({
+    where,
+    orderBy,
+    include: {
+      author: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+  return res.status(200).json(posts);
 };
 
 const getPostByID = async (req, res) => {
